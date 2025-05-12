@@ -1,6 +1,8 @@
-import 'package:bookly/Features/home/data/models/book_model/book_model.dart';
-import 'package:bookly/Features/home/domain/entities/book_entity.dart';
 import 'package:bookly/core/utils/api_service.dart';
+import 'package:bookly/core/utils/consts.dart';
+import 'package:bookly/core/utils/functions/save_books.dart';
+import 'package:bookly/features/home/data/models/book_model/book_model.dart';
+import 'package:bookly/features/home/domain/entities/book_entity.dart';
 
 abstract class HomeRemoteDataSource {
   Future<List<BookEntity>> fetchFeaturedBooks();
@@ -16,15 +18,7 @@ class HomeRemoteDataSourceImpl extends HomeRemoteDataSource {
     var result = await apiService.get(
         endPoint: 'volumes?Filtering=free-ebooks&q=subiect:programming&');
     List<BookEntity> books = getBooksList(result);
-
-    return books;
-  }
-
-  List<BookEntity> getBooksList(Map<String, dynamic> result) {
-    List<BookEntity> books = [];
-    for (var element in result['items']) {
-      books.add(BookModel.fromJson(element));
-    }
+    saveBooks(books, kFeaturedBooksBox);
     return books;
   }
 
@@ -34,7 +28,15 @@ class HomeRemoteDataSourceImpl extends HomeRemoteDataSource {
         endPoint:
             'volumes?Filtering=free-ebooks&q=subiect:programming&Sorting=newest&');
     List<BookEntity> books = getBooksList(result);
+    saveBooks(books, kNewestBooksBox);
+    return books;
+  }
 
+  List<BookEntity> getBooksList(Map<String, dynamic> result) {
+    List<BookEntity> books = [];
+    for (var element in result['items']) {
+      books.add(BookModel.fromJson(element));
+    }
     return books;
   }
 }
